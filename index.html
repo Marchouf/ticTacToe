@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <input type="file" multiple>
+   <script type="text/javascript" src="./script.js"></script>
+  <script>
+
+      input.addEventListener("change",function(){
+        Array.prototype.forEach.call(input.files, function(file){
+          var reader = new FileReader();
+            reader.addEventListener("load", function(){
+              myFile =reader.result.split(/\n/);
+                for(var i = 0; i < myFile.length;i++){
+                  tab[i] = myFile[i].split(" ");
+                  turn = tab[i][0];
+                  if(!tab[i][0] || (tab[i][0] != "X" && tab[i][0] != "O") || (tab[i][1] < 0 || tab[i][1] > 2)||(tab[i][2] < 0 || tab[i][2] > 2) ){
+                    document.write("<div id=\"anomalie\">Invalid input</div>");
+                    return false;
+                  }
+                  if(turn == prevTurn){
+                    //Si un meme joueur joue deux fois de suite erreur
+                    document.write("<div id=\"anomalie\">Player " + tab[i][0] + " cannot play twice.</div>");
+                    return false;
+                  }else{
+                    if (i == 0  && tab[i][0] != "X")
+                    {
+                      // La partie commence obligatoirement par le joueur X
+                      document.write("<div id=\"anomalie\">Player X must start the game.</div>");
+                      return false;
+                    } else{
+                      //Coup deja joue
+                      if(i > 0 && ( tab[i][1] == tab[i-1][1] && tab[i-1][2] == tab[i][2])){
+                        document.write("<div id=\"anomalie\">The move have been ever played.</div>");
+                        return false;
+                      }  else{
+                        //Rempli la grille
+                      document.write("<div id=\"description\"><br>Player :" + tab[i][0] + "</br>");
+                      document.write("Play: x: "+ tab[i][1] + " y: "+ tab[i][2]+"</div>");
+                      grille[tab[i][1]][tab[i][2]] = tab[i][0];
+                      }
+                    }
+                  }
+                  prevTurn = turn;
+                  nbTurn++;
+                  if (myFile.length == nbTurn){
+                    for(var i = 0; i < grille.length; i++){
+                      for(var j = 0; j < grille.length; j++){
+                        // Calcul si toutes les cases sont remplies
+                        if(grille[i][j] == undefined || grille[i][j] == ""){
+                          grille[i][j] = "";
+                          emptyCell += 1;
+                        }
+                      }
+                    }
+                    for(var i = 0; i < 2; i++){
+                      var isVictory = checkVictory(grille, tab[i][0]);
+                      if(isVictory){
+                          document.write("<div id=\"Victoire\">Player " +  tab[i][0] + " won</div");
+                        return ;
+                      } else {
+                        if(emptyCell > 0){
+                          document.write("<div id=\"enCours\">Game not over</div>");
+                          return;
+                        }else{
+                          document.write("<div id=\"draw\">No winner/div>");
+                          return;
+                        }
+                      }
+                    }
+                  }
+                }
+              });
+            reader.readAsText(file);
+        });
+  });
+</script>
+</html>
